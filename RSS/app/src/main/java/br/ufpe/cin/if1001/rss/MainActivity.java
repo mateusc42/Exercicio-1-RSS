@@ -2,11 +2,17 @@ package br.ufpe.cin.if1001.rss;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
-
+import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,10 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends Activity {
-
-    //ao fazer envio da resolucao, use este link no seu codigo!
-    private SharedPreferences sharedPref;
-
     //OUTROS LINKS PARA TESTAR...
     //http://rss.cnn.com/rss/edition.rss
     //http://pox.globo.com/rss/g1/brasil/
@@ -39,10 +41,34 @@ public class MainActivity extends Activity {
         conteudoRSS = (ListView) findViewById(R.id.conteudoRSS);
     }
 
+    /**
+     * Executa carregamento do feed quando a Activity inicia.
+     */
     @Override
     protected void onStart() {
         super.onStart();
-        new CarregaRSStask().execute(this.sharedPref.getString("rssFeed", getString(R.string.rss_feed_default)));
+
+        String url = PreferenciasActivity.getDefaults("rssFeed", getApplicationContext());
+        if (url != null) {
+            new CarregaRSStask().execute(url);
+        } else {
+            new CarregaRSStask().execute(getString(R.string.rss_feed_default));
+        }
+    }
+
+    /**
+     * Executa carregamento do feed quando a Activity é resumida.
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String url = PreferenciasActivity.getDefaults("rssFeed", getApplicationContext());
+        if (url != null) {
+            new CarregaRSStask().execute(url);
+        } else {
+            new CarregaRSStask().execute(getString(R.string.rss_feed_default));
+        }
     }
 
     private class CarregaRSStask extends AsyncTask<String, Void, List<ItemRSS>> {
@@ -54,11 +80,12 @@ public class MainActivity extends Activity {
         @Override
         protected List<ItemRSS> doInBackground(String... params) {
             String conteudo = "provavelmente deu erro...";
+
             List<ItemRSS> titles = new ArrayList<ItemRSS>();
             try {
                 conteudo = getRssFeed(params[0]);
                 titles = ParserRSS.parse(conteudo);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return titles;
@@ -70,6 +97,7 @@ public class MainActivity extends Activity {
 
             //ajuste para usar uma ListView
             //o layout XML a ser utilizado esta em res/layout/itemlista.xml
+
             TitleDateArrayAdapter adapter = new TitleDateArrayAdapter(MainActivity.this, s);
             conteudoRSS.setAdapter(adapter);
         }
@@ -96,5 +124,39 @@ public class MainActivity extends Activity {
             }
         }
         return rssFeed;
+    }
+
+    /**
+     * Cria menu.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+
+        // return true so that the menu pop up is opened
+        return true;
+    }
+
+    /**
+     * Descreve ações do menu.
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            /**
+             * Inicia Activity de preferências.
+             */
+            case R.id.item_prefs:
+                Intent i = new Intent(this, PreferenciasActivity.class);
+                this.startActivity(i);
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 }

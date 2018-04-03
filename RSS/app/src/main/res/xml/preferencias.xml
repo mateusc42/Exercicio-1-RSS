@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" android:key="@+id/item_prefs">
+    <EditTextPreference
+        android:dialogMessage="Digite o feed"
+        android:dialogTitle="Alterar feed"
+        android:key="rssFeed"
+        android:negativeButtonText="Cancelar"
+        android:positiveButtonText="Salvar"
+        android:title="Feed"/>
 </PreferenceScreen>
