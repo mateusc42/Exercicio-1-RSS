@@ -70,7 +70,7 @@ public class MainActivity extends Activity {
 
             //ajuste para usar uma ListView
             //o layout XML a ser utilizado esta em res/layout/itemlista.xml
-            ArrayAdapter<ItemRSS> adapter = new ArrayAdapter<ItemRSS>(getApplicationContext(), android.R.layout.simple_list_item_1, s);
+            TitleDateArrayAdapter adapter = new TitleDateArrayAdapter(MainActivity.this, s);
             conteudoRSS.setAdapter(adapter);
         }
     }
