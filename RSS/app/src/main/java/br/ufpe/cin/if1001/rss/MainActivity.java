@@ -14,8 +14,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import static br.ufpe.cin.if1001.rss.ParserRSS.parserSimples;
-
 public class MainActivity extends Activity {
 
     //ao fazer envio da resolucao, use este link no seu codigo!
@@ -45,19 +43,19 @@ public class MainActivity extends Activity {
         new CarregaRSStask().execute(RSS_FEED);
     }
 
-    private class CarregaRSStask extends AsyncTask<String, Void, List<String>> {
+    private class CarregaRSStask extends AsyncTask<String, Void, List<ItemRSS>> {
         @Override
         protected void onPreExecute() {
             Toast.makeText(getApplicationContext(), "iniciando...", Toast.LENGTH_SHORT).show();
         }
 
         @Override
-        protected List<String> doInBackground(String... params) {
+        protected List<ItemRSS> doInBackground(String... params) {
             String conteudo = "provavelmente deu erro...";
-            List<String> titles = new ArrayList<String>();
+            List<ItemRSS> titles = new ArrayList<ItemRSS>();
             try {
                 conteudo = getRssFeed(params[0]);
-                titles = parserSimples(conteudo);
+                titles = ParserRSS.parse(conteudo);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -65,7 +63,7 @@ public class MainActivity extends Activity {
         }
 
         @Override
-        protected void onPostExecute(List<String> s) {
+        protected void onPostExecute(List<ItemRSS> s) {
             Toast.makeText(getApplicationContext(), "terminando...", Toast.LENGTH_SHORT).show();
 
             //ajuste para usar uma ListView
