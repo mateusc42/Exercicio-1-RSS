@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import static br.ufpe.cin.if1001.rss.ParserRSS.parserSimples;
 
 public class MainActivity extends Activity {
 
@@ -41,30 +45,32 @@ public class MainActivity extends Activity {
         new CarregaRSStask().execute(RSS_FEED);
     }
 
-    private class CarregaRSStask extends AsyncTask<String, Void, String> {
+    private class CarregaRSStask extends AsyncTask<String, Void, List<String>> {
         @Override
         protected void onPreExecute() {
             Toast.makeText(getApplicationContext(), "iniciando...", Toast.LENGTH_SHORT).show();
         }
 
         @Override
-        protected String doInBackground(String... params) {
+        protected List<String> doInBackground(String... params) {
             String conteudo = "provavelmente deu erro...";
+            List<String> titles = new ArrayList<String>();
             try {
                 conteudo = getRssFeed(params[0]);
+                titles = parserSimples(conteudo);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return conteudo;
+            return titles;
         }
 
         @Override
-        protected void onPostExecute(String s) {
+        protected void onPostExecute(List<String> s) {
             Toast.makeText(getApplicationContext(), "terminando...", Toast.LENGTH_SHORT).show();
 
             //ajuste para usar uma ListView
             //o layout XML a ser utilizado esta em res/layout/itemlista.xml
-            conteudoRSS.setText(s);
+            conteudoRSS.setText("" + s.size());
         }
     }
 
